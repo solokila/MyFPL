@@ -21,16 +21,16 @@ const tabName = {
 
 //custom bottom tab
 function CustomTabBarIcon(route, focused, color, size) {
-    let icon = require('../../media/bottomnavigation_home_selected.png')
+    let icon = require('../../media/img//bottomnavigation_home.png')
     
     switch (route.name) {
         case tabName.HOME:
             if (focused) {
-                icon = require('../../media/bottomnavigation_home.png')
+                icon = require('../../media/img//bottomnavigation_home.png')
                 //mau icon khi click
 
             } else {
-                icon = require('../../media/bottomnavigation_home.png')
+                icon = require('../../media/img//bottomnavigation_home.png')
             }
             break;
         case tabName.SCHEDULE:
