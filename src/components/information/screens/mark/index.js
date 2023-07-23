@@ -16,7 +16,7 @@ const Mark = (props) => {
         textAlign:"center",
         marginTop:20
       }}
-      >Mark</Text>
+      >Mark 1234</Text>
     </View>
   )
 }
