@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Modal, TouchableWithoutFeedback } from 'react-native';
-
 const AttendanceScreen = (props) => {
   const { navigation } = props;
 
@@ -28,6 +27,10 @@ const AttendanceScreen = (props) => {
     },
     // More attendance items here
   ]);
+  const toggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
+
 
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -54,9 +57,22 @@ const AttendanceScreen = (props) => {
           })
         }
       >
-        <Text style={styles.itemText}>NameClass: {item.NameClass}</Text>
-        <Text style={styles.itemText}>MissUntilNow: {item.MissUntilNow}</Text>
-        <Text style={styles.itemText}>AllCountMiss: {item.AllCountMiss}</Text>
+      <View style={styles.itemRow}>
+          <View style={styles.itemColumn}>
+            <Text style={styles.classNameText}>{item.NameClass}</Text>
+            {item.Description ? (
+              <Text style={styles.itemDescription}>{item.Description}</Text>
+            ) : null}
+          </View>
+          <View style={styles.itemColumn}>
+            <Text style={styles.missCount}>{item.MissUntilNow}</Text>
+            <Text style={styles.itemSmallText}>Missed</Text>
+          </View>
+          <View style={styles.itemColumn}>
+            <Text style={styles.allCount}>{item.AllCountMiss}</Text>
+            <Text style={styles.itemSmallText}>Total</Text>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -83,8 +99,10 @@ const AttendanceScreen = (props) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.menuButton} onPress={() => setShowMenu(!showMenu)}>
+    <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
         <Text style={styles.menuText}>{text}</Text>
+        {/* Render a custom icon for the menu button */}
+        <Text style={styles.menuIcon}>{showMenu ? '▲' : '▼'}</Text>
       </TouchableOpacity>
 
       {renderMenu()}
@@ -102,6 +120,53 @@ const AttendanceScreen = (props) => {
 export default AttendanceScreen;
 
 const styles = StyleSheet.create({
+  classNameText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  itemSmallText: {
+    color: '#B0B0B0',
+    fontSize: 12,
+  },
+  itemContainer: {
+    backgroundColor: '#455A64',
+    borderRadius: 10,
+    elevation: 3,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  itemRow: {
+    flexDirection: 'row', // Arrange the itemColumns horizontally
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  itemColumn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1, // Each itemColumn takes equal space
+  },
+  itemDescription: {
+    color: '#B0B0B0',
+    fontSize: 14,
+  },
+  missCount: {
+    color: '#FF5252', // Red color for MissUntilNow count
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  allCount: {
+    color: '#000000', // Black color for AllCountMiss count
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  menuIcon: {
+    color: '#FED36A',
+    fontSize: 18,
+    marginLeft: 5,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -110,18 +175,25 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 20, // Increase this value to make the button taller
+    paddingHorizontal: 30, // Increase this value to make the button wider
     backgroundColor: '#455A64',
     borderRadius: 10,
     marginBottom: 10,
     borderColor: '#FED36A',
     borderWidth: 2,
+    flexDirection: 'row', // To align text and icon horizontally
+    alignItems: 'center', // To center items vertically
   },
   menuText: {
     color: '#ffffff',
     fontWeight: 'bold',
     fontSize: 16,
+    marginRight: 5, // Add some space between the text and icon
+  },
+  menuIcon: {
+    color: '#FED36A',
+    fontSize: 18,
   },
   menuModal: {
     backgroundColor: 'white',

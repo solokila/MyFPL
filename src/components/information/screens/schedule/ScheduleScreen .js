@@ -1,195 +1,202 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, Modal, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
+import MonthMenu from './MonthMenu';
+// Import your API function to fetch schedule data from the database
+// import { fetchScheduleData } from './api';
+
+// Fake data for testing
+const FAKE_DATA = [
+  {
+    id: 1,
+    roomNumber: 'Room 101',
+    date: '2023-07-27',
+    description: 'Description for item 1',
+    teacher: 'Teacher A',
+    class: 'Class X',
+    exemption: 'Exempted',
+    status: 'Active',
+    shift: 'Morning',
+    numberOfSession: 2,
+  },
+  {
+    id: 2,
+    roomNumber: 'Room 101',
+    date: '2023-07-27',
+    description: 'Description for item 1',
+    teacher: 'Teacher A',
+    class: 'Class X',
+    exemption: 'Exempted',
+    status: 'Active',
+    shift: 'Morning',
+    numberOfSession: 2,
+  },
+  {
+    id: 3,
+    roomNumber: 'Room 101',
+    date: '2023-07-27',
+    description: 'Description for item 1',
+    teacher: 'Teacher A',
+    class: 'Class X',
+    exemption: 'Exempted',
+    status: 'Active',
+    shift: 'Morning',
+    numberOfSession: 2,
+  },
+  {
+    id: 4,
+    roomNumber: 'Room 101',
+    date: '2023-07-27',
+    description: 'Description for item 1',
+    teacher: 'Teacher A',
+    class: 'Class X',
+    exemption: 'Exempted',
+    status: 'Active',
+    shift: 'Morning',
+    numberOfSession: 2,
+  },
+  // Add more items here...
+];
 
 const ScheduleScreen = () => {
-  const [showMenu, setShowMenu] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState('1 next day'); // Default selection
-  const [scheduleData, setScheduleData] = useState([
-    // Replace this with your actual schedule data
-    {
-      id: '1',
-      RoomNumber: '101',
-      date: '2023-07-22',
-      Description: 'Some description',
-      Teacher: 'John Doe',
-      Class: 'Math',
-      exemption: 'No',
-      Status: 'Active',
-      Shift: 'Morning',
-      NumberOfSession: '3',
-    }, {
-      id: '2',
-      RoomNumber: '101',
-      date: '2023-07-22',
-      Description: 'Some description',
-      Teacher: 'John Doe',
-      Class: 'Math',
-      exemption: 'No',
-      Status: 'Active',
-      Shift: 'Morning',
-      NumberOfSession: '3',
-    },
-    {
-      id: '3',
-      RoomNumber: '101',
-      date: '2023-07-22',
-      Description: 'Some description',
-      Teacher: 'John Doe',
-      Class: 'Math',
-      exemption: 'No',
-      Status: 'Active',
-      Shift: 'Morning',
-      NumberOfSession: '3',
-    },
-    {
-      id: '4',
-      RoomNumber: '101',
-      date: '2023-07-22',
-      Description: 'Some description',
-      Teacher: 'John Doe',
-      Class: 'Math',
-      exemption: 'No',
-      Status: 'Active',
-      Shift: 'Morning',
-      NumberOfSession: '3',
-    },
-    {
-      id: '5',
-      RoomNumber: '101',
-      date: '2023-07-22',
-      Description: 'Some description',
-      Teacher: 'John Doe',
-      Class: 'Math',
-      exemption: 'No',
-      Status: 'Active',
-      Shift: 'Morning',
-      NumberOfSession: '3',
-    },
-    // More schedule items here
-  ]);
+  const [selectedMonth, setSelectedMonth] = useState('January');
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [scheduleData, setScheduleData] = useState(FAKE_DATA);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedScheduleItem, setSelectedScheduleItem] = useState(null);
 
-  const [selectedItem, setSelectedItem] = useState(null);
+  // Fetch schedule data for the selected day whenever the month or day changes
+  useEffect(() => {
+    // Replace this with your API call to fetch data from the database
+    // fetchScheduleData(selectedMonth, selectedDay)
+    //   .then((data) => {
+    //     setScheduleData(data);
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error fetching schedule data:', error);
+    //     setScheduleData([]); // Set empty array in case of an error
+    //   });
+    // For testing, we are using the fake data defined above
+  }, [selectedMonth, selectedDay]);
 
-  const menuOptions = ['1 next day', '7 next days', '30 next days', '2 months next days', '3 months next days'];
+  // Generate data for the days in the selected month (e.g., 1 to 31)
+  const daysInSelectedMonth = Array.from({ length: 31 }, (_, index) => index + 1);
 
-  //text cho menu
-  const [text, setText] = useState('1 next day');
-
-  const handleMenuItemPress = (option) => {
-    setSelectedMenuItem(option);
-    setShowMenu(false);
-    // Fetch new data based on the selected option here if required
-    // For simplicity, we're using dummy data.
-    setText(option);
+  // Handler for month change from MonthMenu
+  const handleMonthChange = (month) => {
+    setSelectedMonth(month);
   };
 
-  const renderItem = ({ item }) => {
+  // Handler for day selection in the horizontal FlatList
+  const handleDayPress = (day) => {
+    setSelectedDay(day);
+  };
+
+  // Handler for clicking on a schedule item
+  const handleScheduleItemClick = (scheduleItem) => {
+    setSelectedScheduleItem(scheduleItem);
+    setShowModal(true);
+  };
+
+  // Render schedule details when a schedule item is clicked
+  const renderScheduleDetails = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.itemContainer} onPress={() => setSelectedItem(item)}>
-        <Text style={styles.itemText}>Phòng: {item.RoomNumber}</Text>
-        <Text style={styles.itemText}>Ngày: {item.date} =&gt; Ca : {item.Shift}</Text>
-        <Text style={styles.itemText}>Mô tả: {item.Description}</Text>
+      <TouchableOpacity onPress={() => handleScheduleItemClick(item)}>
+        <View style={styles.scheduleItemContainer}>
+          <View style={styles.leftInfo}>
+            <Text style={styles.roomNumberText}>{item.roomNumber}</Text>
+            <Text style={styles.dateText}>{item.date}</Text>
+          </View>
+          <View style={styles.rightInfo}>
+            <Text style={styles.scheduleDescription}>{item.description}</Text>
+            <Text style={styles.additionalInfo}>Giáo viên: {item.teacher}</Text>
+            <Text style={styles.additionalInfo}>Lớp: {item.class}</Text>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
 
-  const closePopup = () => {
-    setSelectedItem(null);
-  };
 
-  const renderMoreInfoPopup = () => {
-    if (!selectedItem) return null;
+  // Render detailed schedule information in modal
+  const renderPopupContent = () => {
+    if (!selectedScheduleItem) return null;
 
     return (
-      <Modal visible={true} animationType="slide" transparent>
-        <TouchableWithoutFeedback onPress={closePopup}>
-          <View style={styles.popupContainer}>
-            <TouchableWithoutFeedback>
-              <View style={styles.popup}>
-                <Text style={styles.popupTitle}>Lịch học chi tiết</Text>
-
-
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Số phòng:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.RoomNumber}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Ngày:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.date}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Mô tả:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.Description}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Giảng viên:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.Teacher}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Lớp:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.Class}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Miễn giảm:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.exemption}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Trạng thái:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.Status}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Ca:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.Shift}</Text>
-                </View>
-                <View style={styles.popupRow}>
-                  <Text style={styles.popupLabel}>Số buổi học:</Text>
-                  <Text style={styles.popupValue}>{selectedItem.NumberOfSession}</Text>
-                </View>
-                {/* Add more schedule details here */}
-                <TouchableOpacity style={styles.closeButton} onPress={closePopup}>
-                  <Text style={styles.closeButtonText}>Đóng</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
+      <View style={styles.popupContainer}>
+        <View style={styles.popupContent}>
+          <Text style={styles.popupTitle}>Chi Tiết Môn Học</Text>
+          <View style={styles.popupItem}>
+            <Text style={styles.popupLabel}>Số phòng:</Text>
+            <Text style={styles.popupValue}>{selectedScheduleItem.roomNumber}</Text>
           </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+          <View style={styles.popupItem}>
+            <Text style={styles.popupLabel}>Ngày:</Text>
+            <Text style={styles.popupValue}>{selectedScheduleItem.date}</Text>
+          </View>
+          <View style={styles.popupItem}>
+            <Text style={styles.popupLabel}>Mô tả:</Text>
+            <Text style={styles.popupValue}>{selectedScheduleItem.description}</Text>
+          </View>
+          <View style={styles.popupItem}>
+            <Text style={styles.popupLabel}>Giáo viên:</Text>
+            <Text style={styles.popupValue}>{selectedScheduleItem.teacher}</Text>
+          </View>
+          <View style={styles.popupItem}>
+            <Text style={styles.popupLabel}>Lớp:</Text>
+            <Text style={styles.popupValue}>{selectedScheduleItem.class}</Text>
+          </View>
+          {/* Add more schedule details here */}
+          <Pressable style={styles.closeButton} onPress={() => setShowModal(false)}>
+            <Text style={styles.closeButtonText}>Đóng</Text>
+          </Pressable>
+        </View>
+      </View>
     );
   };
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.menuButton} onPress={() => setShowMenu(!showMenu)}>
-        <Text style={styles.menuText}>{text}</Text>
-      </TouchableOpacity>
+      {/* Dropdown menu to select the month */}
+      <MonthMenu menuOptions={menuOptions} selectedOption={selectedMonth} onOptionPress={handleMonthChange} />
 
-      <Modal visible={showMenu} animationType="fade" transparent>
-        <TouchableWithoutFeedback onPress={() => setShowMenu(false)}>
-          <View style={styles.menuModal}>
-            {menuOptions.map((option) => (
-              <TouchableOpacity
-                key={option}
-                style={styles.menuOption}
-                onPress={() => handleMenuItemPress(option)}
-              >
-                <Text>{option}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
+      {/* Horizontal FlatList to display the days */}
       <FlatList
-        data={scheduleData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.flatListContainer}
+        data={daysInSelectedMonth}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => handleDayPress(item)}>
+            <View style={[styles.dayItem, item === selectedDay && styles.selectedDayItem]}>
+              <Text style={[styles.dayText, item === selectedDay && styles.selectedDayText]}>
+                {item}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.toString()}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.dayListContainer}
       />
 
-      {renderMoreInfoPopup()}
+      {/* Vertical FlatList to display the schedule for the selected day */}
+      <FlatList
+        data={scheduleData}
+        renderItem={renderScheduleDetails}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.scheduleListContainer}
+      />
+
+      {/* Modal for displaying detailed schedule information */}
+      <Modal visible={showModal} animationType="slide" transparent>
+        {renderPopupContent()}
+      </Modal>
     </View>
   );
 };
+
+const menuOptions = [
+  'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12',
+];
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -197,91 +204,116 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#212832',
   },
-  menuButton: {
-    alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  dayItem: {
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#455A64',
     borderRadius: 10,
-    marginBottom: 10,
-    borderColor: '#FED36A',
-    borderWidth: 2,
+    marginHorizontal: 5,
   },
-  menuText: {
-    color: '#ffffff',
+  selectedDayItem: {
+    backgroundColor: '#FED36A',
+  },
+  dayText: {
+    color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: 'bold',
-    fontSize: 16,
   },
-  menuModal: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    elevation: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignSelf: 'center',
-    marginTop: 50,
+  selectedDayText: {
+    color: '#000000',
   },
-  menuOption: {
-    paddingVertical: 5,
+  dayListContainer: {
+    marginBottom: 10,
   },
-  flatListContainer: {
-    flexGrow: 1,
-  },
-  itemContainer: {
+  scheduleItemContainer: {
     backgroundColor: '#455A64',
     borderRadius: 10,
-    elevation: 3,
     padding: 10,
     marginBottom: 10,
   },
-  itemText: {
-    color: '#FFFFFF',
-    // fontWeight: 'bold',
+ 
+  scheduleListContainer: {
+    flexGrow: 1, // Make the FlatList take the available space to align it closely with the days view
+  },
+  scheduleItemContainer: {
+    flexDirection: 'row', // To have roomNumber and date on the left side, and description on the right side
+    justifyContent: 'space-between', // To push description to the right
+    alignItems: 'center', // To align items vertically within each row
+    backgroundColor: '#455A64',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    elevation: 3, // Add elevation to create a shadow effect
+  },
+  leftInfo: {
+    alignItems: 'flex-start', // Align items to the left side
+  },
+  roomNumberText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FED36A', // Customize the color to stand out
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#ffffff', // Customize the color to stand out
+  },
+  rightInfo: {
+    flex: 1, // To allow description to take the remaining space on the right side
+    paddingLeft: 20,
+  },
+  scheduleDescription: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#ffffff', // Customize the color to stand out
+  },
+  additionalInfo: {
     fontSize: 14,
+    color: '#a9a9a9', // Customize the color for additional information
   },
   popupContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-  popup: {
-    backgroundColor: '#FED36A',
-    borderRadius: 10,
+  popupContent: {
+    backgroundColor: '#FFFFFF',
     padding: 20,
-    elevation: 5,
-    width: '70%',
-    maxWidth: '80%',
+    borderRadius: 10,
+    width: '80%',
   },
   popupTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
-    alignSelf: 'center',
-    color: '#000000',
+    marginBottom: 15,
+    textAlign: 'center',
   },
-  popupRow: {
+  popupItem: {
     flexDirection: 'row',
-    marginBottom: 5,
+    marginBottom: 10,
   },
   popupLabel: {
+    flex: 1,
     fontWeight: 'bold',
-    marginRight: 5,
-    color: '#000000',
   },
   popupValue: {
-    flex: 1,
+    flex: 2,
   },
   closeButton: {
-    alignSelf: 'flex-end',
+    backgroundColor: '#FED36A',
+    borderRadius: 5,
     paddingVertical: 8,
+    paddingHorizontal: 20,
+    marginTop: 15,
+    alignSelf: 'center',
   },
   closeButtonText: {
-    color: 'blue',
+    color: '#000000',
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  
-  
 });
 
 export default ScheduleScreen;

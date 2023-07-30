@@ -37,6 +37,7 @@ const Schedule = () => {
       <Tab.Screen name="Học phí" component={Tuition} />
     </Tab.Navigator>
   );
+  //agagaga
 };
 
 export default Schedule;
