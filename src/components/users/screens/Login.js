@@ -4,37 +4,63 @@ import {
   TouchableOpacity, Modal, FlatList,
   TouchableHighlight, ScrollView, KeyboardAvoidingView, Alert, Dimensions
 } from 'react-native'
-import React, { useState, useContext } from 'react'
+import React, { useState,useContext, useEffect } from 'react'
 import AppLoader from '../../../utils/AppLoader';
+import AxiosInstance from '../../helpers/AxiosInstance';
+import { UserContext } from '../UserContext';
 
-const data = [
-  { id: '1', name: 'Mục 1111111111' },
-  { id: '2', name: 'Mục 2' },
-  { id: '3', name: 'Mục 3' },
-  { id: '4', name: 'Mục 4' },
-  { id: '5', name: 'Mục 5' },
-  { id: '6', name: 'Mục 6' },
-  { id: '7', name: 'Mục 7' },
-  { id: '8', name: 'Mục 8' },
-  { id: '9', name: 'Mục 9' },
-  // Thêm các mục khác nếu cần
-];
-
-const Login = (props) => {
+const Register = (props) => {
 
   const { navigation } = props;
 
   const [isLoading, setIsLoading] = useState(false)
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedButtonText, setSelectedButtonText] = useState('Chọn cơ sở đào tạo');
+
+  const [branch, setBranch] = useState([])
+  const [username, setUsername] = useState('nguyen van teo2');
+  const [password, setPassword] = useState('123456');
+  const { onLogin } = useContext(UserContext);
+
+  // đây là một cách để gọi API khi màn hình được mở
+  // api này từ bảng branch
+  useEffect(() => {
+    (async function () {
+      try {
+        const response = await AxiosInstance().get("/branch");
+        // console.log('branch response:', response);
+        setBranch(response.data)
+      } catch (error) {
+        console.log('branch error:', error);
+      }
+    })()
+  }, [])
+
+  // xử lý đăng nhập
+  const onLoginPress = async () => {
+    setIsLoading(true);
+    const result = await onLogin(username, password);
+    // console.log('result:', result);
+    // console.log('username:', username);
+    setIsLoading(false);
+    if (!result) {
+      Alert.alert('Login failed');
+      setUsername('');
+      setPassword('');
+    }
+  }
 
   const handleItemPress = (item) => {
     setSelectedItem(item);
+    setSelectedButtonText(item.name);
   };
 
   return (
     // dung de day man hinh len khi typing (keyboardAvoidingView)
     <>
+      <KeyboardAvoidingView>
+        <ScrollView>
       <View style={loginstyles.body}>
         {isModalVisible && <View style={loginstyles.overlay} />}
         <View style={loginstyles.logo}>
@@ -56,7 +82,29 @@ const Login = (props) => {
         </View>
 
         <TouchableOpacity onPress={() => setModalVisible(true)} style={loginstyles.button}>
-          <Text style={loginstyles.buttonText}>Chọn cơ sở đào tạo</Text>
+          <Text style={loginstyles.buttonText}>{selectedButtonText}</Text>
+        </TouchableOpacity>
+
+        {/* Các trường đăng ký */}
+        <TextInput
+          style={loginstyles.input}
+          value={username}
+          placeholder="Tên đăng nhập"
+          placeholderTextColor="#8CAAB9"
+          onChangeText={(text) => setUsername(text)}
+        />
+        <TextInput
+          value={password}
+          style={loginstyles.input}
+          placeholder="Mật khẩu"
+          placeholderTextColor="#8CAAB9"
+          secureTextEntry
+          onChangeText={(text) => setPassword(text)}
+        />
+
+        {/* nút đăng nhập */}
+        <TouchableOpacity onPress={onLoginPress} style={loginstyles.loginButton}>
+          <Text style={loginstyles.loginButtonText}>Đăng nhập</Text>
         </TouchableOpacity>
 
         {/* Dòng "Or continue with" */}
@@ -76,7 +124,9 @@ const Login = (props) => {
         {/* Dòng "Don’t have an account? Sign Up" */}
         <View style={loginstyles.signUpContainer}>
           <Text style={loginstyles.accountText}>Don’t have an account?</Text>
-          <Text style={loginstyles.signUpText}>Sign Up</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <Text style={loginstyles.signUpText}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
 
         {/*phan modal*/}
@@ -91,34 +141,36 @@ const Login = (props) => {
             </TouchableOpacity>
 
             <FlatList
-              data={data}
+              data={branch}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[
                     loginstyles.listItem,
-                    selectedItem?.id === item.id && loginstyles.highlightedItem,
+                    selectedItem?._id === item._id && loginstyles.highlightedItem,
                   ]}
                   onPress={() => handleItemPress(item)}
                 >
                   <Text
                     style={[
                       loginstyles.listItemText,
-                      selectedItem?.id === item.id && loginstyles.highlightedItemText,
+                      selectedItem?._id === item._id && loginstyles.highlightedItemText,
                     ]}
                   >{item.name}</Text>
                 </TouchableOpacity>
               )}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item._id}
             />
           </View>
         </Modal>
         {isLoading ? <AppLoader /> : null}
       </View>
+      </ScrollView>
+      </KeyboardAvoidingView>
     </>
   )
 }
 
-export default Login
+export default Register
 
 const loginstyles = StyleSheet.create({
 
@@ -164,8 +216,8 @@ const loginstyles = StyleSheet.create({
 
   },
   background_image: {
-    width: 300,
-    height: 300,
+    width: 200,
+    height: 200,
     // borderRadius: 10, // Bo tròn góc của ảnh
     backgroundColor: 'gray',
   },
@@ -176,7 +228,7 @@ const loginstyles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     // borderRadius: 5,
-    marginTop: 50, // Khoảng cách giữa ảnh và nút
+    marginTop: 41, // Khoảng cách giữa ảnh và nút
 
   },
   buttonText: {
@@ -216,7 +268,7 @@ const loginstyles = StyleSheet.create({
   listItemText: {
     fontSize: 18,
     color: '#FF9900', // Màu chữ của danh sách
-    marginHorizontal: 50,
+    marginHorizontal: 20,
   },
   highlightedItem: {
     backgroundColor: '#FED36A', // Màu highlight khi chọn
@@ -228,6 +280,30 @@ const loginstyles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject, // Mở rộng phần tử để chiếm toàn bộ không gian của màn hình
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Màu nền overlay với độ mờ
+  },
+
+  //style cho input
+  input: {
+    height: 50,
+    borderBottomWidth: 1,
+    borderColor: '#8CAAB9',
+    color: 'white',
+    fontSize: 16,
+    marginTop: 20,
+  },
+
+  // Stules cho nút đăng nhập bằng
+  loginButton: {
+    backgroundColor: '#FED36A',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginTop: 40,
+  },
+  loginButtonText: {
+    color: '#000000',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 
   // Styles cho dòng "Or continue with"

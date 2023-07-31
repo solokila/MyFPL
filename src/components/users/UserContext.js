@@ -8,9 +8,9 @@ export const UserProvider = (props) => {
     const { children } = props;
     const [user, setUser] = useState(null);
 
-    const onRegister = async (email, password) => {
+    const onRegister = async (username, password, classname) => {
         try {
-            const response = await register(email, password);
+            const response = await register(username, password, classname);
             // console.log('onRegister response:', response);
             return true;
         } catch (error) {
@@ -19,13 +19,15 @@ export const UserProvider = (props) => {
         return false;
     }
 
-    const onLogin = async (email, password) => {
+    const onLogin = async (username, password) => {
         try {
-            const response = await login(email, password);
-            // console.log('onLogin response:', response);
-            if (response.statusCode === 200) {
-                await AsyncStorage.setItem('token', response?.data?.token);
-                setUser(response?.data?.user);
+            // console.log('onLogin username:', username);
+            const response = await login(username, password);
+            console.log('onLogin response:', response);
+            if (response.status === 200) {
+                // await AsyncStorage.setItem('token', response?.data?.token);
+                setUser(response?.data);
+                // console.log('onLogin user:', user);
                 return true;
             }
         } catch (error) {

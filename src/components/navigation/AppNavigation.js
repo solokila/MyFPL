@@ -7,6 +7,7 @@ import Login from '../users/screens/Login';
 import WorkStack from '../information/screens/home/WorkStack';
 import StudyStack from '../information/screens/home/StudyStack';
 import TuitionStack from '../information/screens/home/TuitionStack';
+import UserNavigation from '../users/UserNavigation';
 
 //them thu vien de su dung stack
 import {createStackNavigator} from '@react-navigation/stack';
@@ -21,8 +22,8 @@ const AppNavigation = () => {
         screenOptions={{
           headerShown: false,
         }}
-        initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} />
+        initialRouteName="UserNavigation">
+        <Stack.Screen name="UserNavigation" component={UserNavigation} />
         <Stack.Screen name="InforNavigation" component={InforNavigation} />
         <Stack.Screen name="WorkStack" component={WorkStack} />
         <Stack.Screen name="StudyStack" component={StudyStack} />

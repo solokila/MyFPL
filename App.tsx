@@ -1,20 +1,27 @@
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import type { PropsWithChildren } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import Login from './src/components/users/screens/Login';
 import InforNavigation from './src/components/information/InforNavigation';
 import AppNavigation from './src/components/navigation/AppNavigation';
+import { UserProvider } from './src/components/users/UserContext';
 
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import Register from './src/components/users/screens/Register';
+import UserNavigation from './src/components/users/UserNavigation';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
 function App(): JSX.Element {
   return (
     <SafeAreaView style={styles.body}>
-      <AppNavigation />
+      <UserProvider>
+        <AppNavigation />
+      </UserProvider>
+      {/* <UserNavigation /> */}
     </SafeAreaView>
   );
 }
