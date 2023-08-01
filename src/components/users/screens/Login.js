@@ -4,7 +4,7 @@ import {
   TouchableOpacity, Modal, FlatList,
   TouchableHighlight, ScrollView, KeyboardAvoidingView, Alert, Dimensions
 } from 'react-native'
-import React, { useState,useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import AppLoader from '../../../utils/AppLoader';
 import AxiosInstance from '../../helpers/AxiosInstance';
 import { UserContext } from '../UserContext';
@@ -19,8 +19,8 @@ const Register = (props) => {
   const [selectedButtonText, setSelectedButtonText] = useState('Chọn cơ sở đào tạo');
 
   const [branch, setBranch] = useState([])
-  const [username, setUsername] = useState('nguyen van teo2');
-  const [password, setPassword] = useState('123456');
+  const [username, setUsername] = useState('admin123');
+  const [password, setPassword] = useState('admin123');
   const { onLogin } = useContext(UserContext);
 
   // đây là một cách để gọi API khi màn hình được mở
@@ -59,112 +59,112 @@ const Register = (props) => {
   return (
     // dung de day man hinh len khi typing (keyboardAvoidingView)
     <>
-      <KeyboardAvoidingView>
+      <KeyboardAvoidingView style={loginstyles.body}>
         <ScrollView>
-      <View style={loginstyles.body}>
-        {isModalVisible && <View style={loginstyles.overlay} />}
-        <View style={loginstyles.logo}>
-          <Image
-            style={loginstyles.logo_image}
-            //resizeMode='contain' de hinh anh khong bi cat
-            //cover: hinh anh se bi cat
-            resizeMode='contain'
-            source={require('../../../media/img/polytechnic.png')}
-          />
-        </View>
-        <View style={loginstyles.background}>
-          <Image
-            style={loginstyles.background_image}
-            //resizeMode='contain' de hinh anh khong bi cat
-            resizeMode='contain'
-            source={require('../../../media/img/pana.png')}
-          />
-        </View>
+          {isLoading ? <AppLoader /> : null}
+          <View >
+            {isModalVisible && <View style={loginstyles.overlay} />}
+            <View style={loginstyles.logo}>
+              <Image
+                style={loginstyles.logo_image}
+                //resizeMode='contain' de hinh anh khong bi cat
+                //cover: hinh anh se bi cat
+                resizeMode='contain'
+                source={require('../../../media/img/polytechnic.png')}
+              />
+            </View>
+            <View style={loginstyles.background}>
+              <Image
+                style={loginstyles.background_image}
+                //resizeMode='contain' de hinh anh khong bi cat
+                resizeMode='contain'
+                source={require('../../../media/img/pana.png')}
+              />
+            </View>
 
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={loginstyles.button}>
-          <Text style={loginstyles.buttonText}>{selectedButtonText}</Text>
-        </TouchableOpacity>
-
-        {/* Các trường đăng ký */}
-        <TextInput
-          style={loginstyles.input}
-          value={username}
-          placeholder="Tên đăng nhập"
-          placeholderTextColor="#8CAAB9"
-          onChangeText={(text) => setUsername(text)}
-        />
-        <TextInput
-          value={password}
-          style={loginstyles.input}
-          placeholder="Mật khẩu"
-          placeholderTextColor="#8CAAB9"
-          secureTextEntry
-          onChangeText={(text) => setPassword(text)}
-        />
-
-        {/* nút đăng nhập */}
-        <TouchableOpacity onPress={onLoginPress} style={loginstyles.loginButton}>
-          <Text style={loginstyles.loginButtonText}>Đăng nhập</Text>
-        </TouchableOpacity>
-
-        {/* Dòng "Or continue with" */}
-        <View style={loginstyles.orContainer}>
-          <View style={loginstyles.line} />
-          <Text style={loginstyles.orText}>Or continue with</Text>
-          <View style={loginstyles.line} />
-        </View>
-
-        <TouchableOpacity onPress={() => navigation.navigate('InforNavigation')}>
-          <View style={loginstyles.googleButton}>
-            <Image source={require('../../../media/img/google.png')} style={loginstyles.buttonLogo} />
-            <Text style={loginstyles.googleButtonText}>Google</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* Dòng "Don’t have an account? Sign Up" */}
-        <View style={loginstyles.signUpContainer}>
-          <Text style={loginstyles.accountText}>Don’t have an account?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={loginstyles.signUpText}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/*phan modal*/}
-        <Modal visible={isModalVisible}
-          animationType="fade" //fade: hieu ung mo dan
-          transparent //de modal trong suot
-        >
-          <View style={loginstyles.modalContainer}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}
-              style={loginstyles.closeButton}>
-              <Text style={loginstyles.closeButtonText}>Đóng</Text>
+            <TouchableOpacity onPress={() => setModalVisible(true)} style={loginstyles.button}>
+              <Text style={loginstyles.buttonText}>{selectedButtonText}</Text>
             </TouchableOpacity>
 
-            <FlatList
-              data={branch}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[
-                    loginstyles.listItem,
-                    selectedItem?._id === item._id && loginstyles.highlightedItem,
-                  ]}
-                  onPress={() => handleItemPress(item)}
-                >
-                  <Text
-                    style={[
-                      loginstyles.listItemText,
-                      selectedItem?._id === item._id && loginstyles.highlightedItemText,
-                    ]}
-                  >{item.name}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item._id}
+            {/* Các trường đăng ký */}
+            <TextInput
+              style={loginstyles.input}
+              value={username}
+              placeholder="Tên đăng nhập"
+              placeholderTextColor="#8CAAB9"
+              onChangeText={(text) => setUsername(text)}
             />
+            <TextInput
+              value={password}
+              style={loginstyles.input}
+              placeholder="Mật khẩu"
+              placeholderTextColor="#8CAAB9"
+              secureTextEntry
+              onChangeText={(text) => setPassword(text)}
+            />
+
+            {/* nút đăng nhập */}
+            <TouchableOpacity onPress={onLoginPress} style={loginstyles.loginButton}>
+              <Text style={loginstyles.loginButtonText}>Đăng nhập</Text>
+            </TouchableOpacity>
+
+            {/* Dòng "Or continue with" */}
+            <View style={loginstyles.orContainer}>
+              <View style={loginstyles.line} />
+              <Text style={loginstyles.orText}>Or continue with</Text>
+              <View style={loginstyles.line} />
+            </View>
+
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <View style={loginstyles.googleButton}>
+                <Image source={require('../../../media/img/google.png')} style={loginstyles.buttonLogo} />
+                <Text style={loginstyles.googleButtonText}>Google</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Dòng "Don’t have an account? Sign Up" */}
+            <View style={loginstyles.signUpContainer}>
+              <Text style={loginstyles.accountText}>Don’t have an account?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={loginstyles.signUpText}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/*phan modal*/}
+            <Modal visible={isModalVisible}
+              animationType="fade" //fade: hieu ung mo dan
+              transparent //de modal trong suot
+            >
+              <View style={loginstyles.modalContainer}>
+                <TouchableOpacity onPress={() => setModalVisible(false)}
+                  style={loginstyles.closeButton}>
+                  <Text style={loginstyles.closeButtonText}>Đóng</Text>
+                </TouchableOpacity>
+
+                <FlatList
+                  data={branch}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={[
+                        loginstyles.listItem,
+                        selectedItem?._id === item._id && loginstyles.highlightedItem,
+                      ]}
+                      onPress={() => handleItemPress(item)}
+                    >
+                      <Text
+                        style={[
+                          loginstyles.listItemText,
+                          selectedItem?._id === item._id && loginstyles.highlightedItemText,
+                        ]}
+                      >{item.name}</Text>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item) => item._id}
+                />
+              </View>
+            </Modal>
           </View>
-        </Modal>
-        {isLoading ? <AppLoader /> : null}
-      </View>
-      </ScrollView>
+        </ScrollView>
       </KeyboardAvoidingView>
     </>
   )
@@ -228,7 +228,7 @@ const loginstyles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     // borderRadius: 5,
-    marginTop: 41, // Khoảng cách giữa ảnh và nút
+    marginTop: 40, // Khoảng cách giữa ảnh và nút
 
   },
   buttonText: {

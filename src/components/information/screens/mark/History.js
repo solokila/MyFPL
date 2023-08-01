@@ -1,163 +1,122 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import Collapsible from 'react-native-collapsible';
 
+//service
+import { getAllTranscripts, getAllSubjects } from '../../DataService';
+import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
+
+
 
 function History() {
+
+  //lấy danh sách môn học
+  const [subjects, setSubjects] = useState([]);
+  const getSubjects = async () => {
+    const response = await getAllSubjects();
+    if (response?.status === 200) {
+      setSubjects(response?.data);
+    }
+  };
+
+  // tìm tên môn học theo id
+  const findSubject = (id) => {
+    const subject = subjects.find((item) => {
+      return item._id === id;
+    });
+    // console.log('subject:', subject);
+    return subject;
+  };
+
+  useEffect(() => {
+    getData();
+    getSubjects();
+  }, []); //get data when first render
+
   //data
-  const [data, setData] = useState([
-    {
-      id: '1',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-    {
-      id: '2',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-    {
-      id: '3',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-    {
-      id: '4',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-    {
-      id: '5',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-    {
-      id: '6',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-    {
-      id: '7',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-    {
-      id: '8',
-      semester: 'SUMMER 2023',
-      idSubject: 'Mã môn: MOB305',
-      class: 'Lớp: MD18101',
-      averageMark: 'Điểm trung bình: '+7.8,
-      lesson: 'Số buổi: '+17,
-      subject: 'CSDL',
-      status: 'Passed',
-      isCollapse: true,
-    },
-  ]);
-  const Item = ({ item, onPress }) => (
-    <TouchableOpacity onPress={onPress}>
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  //filter data
+  const filterData = (data) => {
+    const newData = data.filter((item) => {
+      return item.status === 1 || item.status === 2 || item.status === 3;
+    });
+    setData(newData);
+  };
+
+  //get data
+  const getData = async () => {
+    const response = await getAllTranscripts();
+    // console.log('response:', response);
+    if (response?.status === 200) {
+      filterData(response?.data);
+      setLoading(false);
+    }
+  };
+
+  // State để theo dõi mục đang được mở rộng
+  const [expandedItem, setExpandedItem] = useState(null);
+
+
+  
+  const renderItem = ({ item }) => {
+    const isExpanded = expandedItem === item._id;
+    return (
+      <TouchableOpacity onPress={() => handleItemPress(item._id)}>
       <View style={[styles.item, {}]}>
         <View style={[, { flexDirection: 'row', justifyContent: 'space-between', textAlign: 'center' }]}>
-          <Text style={styles.title}>{item.semester}</Text>
-          <Text style={styles.title}>{item.subject}</Text>
-          <Text style={styles.title}>{item.status}</Text>
-        </View>
+           <Text style={styles.title}>{item.term}</Text>
+           <Text style={styles.title}>{findSubject(item.subject_id).idSubject}</Text>
+           <Text style={styles.title}>{item.status}</Text>
+         </View>
 
-
-        <Collapsible collapsed={item.isCollapse}>
+        <Collapsible collapsed={!isExpanded}>
           <View style={[{ width: '100%', height: '1', backgroundColor: 'white' }]}></View>
           <View style={[{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }]}>
             <View style={[{}]}>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.idSubject}</Text>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.averageMark}</Text>
+               <Text style={{ 
+                color: '#FFFFFF', 
+                fontSize: 16 , 
+                //giới hạn độ dài của text
+                width: 100,
+                }}>Môn: {findSubject(item.subject_id).name}</Text>
+               <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Điểm: {item.mark}</Text>
+             </View>
+             <View>
+              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Tín chỉ: {findSubject(item.subject_id).credit}</Text>
+              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Số buổi: 17</Text>
             </View>
-            <View>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.class}</Text>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.lesson}</Text>
-            </View>
-          </View>
-
-
-        </Collapsible>
+           </View>
+         </Collapsible>
       </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
 
-  const renderItem = ({ item }) => (
-    <Item item={item} onPress={() => toggleCollapse(item.id)} />
-  );
-  const handleItemPress = item => {
+  const handleItemPress = (itemID) => {
     // Xử lý hành động khi một mục được bấm vào
-    // console.log('Pressed item:', item.semester);
-    item.isCollapse = !item.isCollapse;
+    setExpandedItem((prevExpandedItem) => (prevExpandedItem === itemID ? null : itemID))
   };
 
-  const toggleCollapse = (itemId) => {
-    setData((prevData) => {
-      return prevData.map((item) => {
-        if (item.id === itemId) {
-          return { ...item, isCollapse: !item.isCollapse };
-        }
-        return item;
-      });
-    });
-  };
+
 
   return (
     <View style={styles.container}>
 
-      <View style={[styles.item, {flexDirection: 'row', justifyContent:'space-between'}]}>
-        <Text style={[styles.title, { fontWeight: 'bold' }]}>Học kỳ</Text>
-        <Text style={[styles.title, { fontWeight: 'bold' }]}>Môn</Text>
-        <Text style={[styles.title, { fontWeight: 'bold' }]}>Điểm</Text>
+      <View style={styles.containerTop}>
+        <Text style={styles.titleTopText}>Học kỳ</Text>
+        <Text style={styles.titleTopText}>Mã Môn</Text>
+        <Text style={styles.titleTopText}>Trạng thái</Text>
       </View>
 
       <FlatList
         data={data}
+        onRefresh={getData}
+        refreshing={loading}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
       />
     </View>
   );
@@ -169,11 +128,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#212832',
     paddingTop: 16,
   },
+  containerTop: {
+    backgroundColor: '#FED36A',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    marginTop: 0,
+    marginHorizontal: 0,
+    // borderRadius: 10,
+    elevation: 5,
+  },
+
+  titleTopText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#212832',
+    flexDirection: 'row'
+  },
+
   item: {
     backgroundColor: '#455A64',
-    padding: 20,
+    padding: 16,
     marginVertical: 8,
-    marginHorizontal: 16,
+    marginHorizontal: 0,
     borderRadius: 10,
     elevation: 5,
     marginTop: 12,
