@@ -3,32 +3,21 @@ import 'react-native-gesture-handler';
 import React, {useContext} from 'react';
 
 import InforNavigation from '../information/InforNavigation';
-import Login from '../users/screens/Login';
-import WorkStack from '../information/screens/home/WorkStack';
-import StudyStack from '../information/screens/home/StudyStack';
-import TuitionStack from '../information/screens/home/TuitionStack';
 import UserNavigation from '../users/UserNavigation';
 
 //them thu vien de su dung stack
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
+// context
+import {UserContext} from '../users/UserContext';
 
 const Stack = createStackNavigator();
 
 const AppNavigation = () => {
+  const {user} = useContext(UserContext);
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName="UserNavigation">
-        <Stack.Screen name="UserNavigation" component={UserNavigation} />
-        <Stack.Screen name="InforNavigation" component={InforNavigation} />
-        <Stack.Screen name="WorkStack" component={WorkStack} />
-        <Stack.Screen name="StudyStack" component={StudyStack} />
-        <Stack.Screen name="TuitionStack" component={TuitionStack} />
-      </Stack.Navigator>
+      {user ? <InforNavigation /> : <UserNavigation />}
     </NavigationContainer>
   );
 };

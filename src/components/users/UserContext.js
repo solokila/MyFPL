@@ -23,7 +23,7 @@ export const UserProvider = (props) => {
         try {
             // console.log('onLogin username:', username);
             const response = await login(username, password);
-            console.log('onLogin response:', response);
+            // console.log('onLogin response:', response);
             if (response.status === 200) {
                 // await AsyncStorage.setItem('token', response?.data?.token);
                 setUser(response?.data);

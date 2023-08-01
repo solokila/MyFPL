@@ -1,8 +1,8 @@
-import {StyleSheet, Text, View, Image} from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
 
 //them bottom tab
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomePage from './screens/home';
 import Mark from './screens/mark';
@@ -51,13 +51,13 @@ function CustomTabBarIcon(route, focused, color, size) {
 }
 
 const InforNavigation = props => {
-  const {navigation} = props;
+  const { navigation } = props;
 
   return (
     <Tab.Navigator
-      screenOptions={({route}) => ({
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({focused, color, size}) =>
+        tabBarIcon: ({ focused, color, size }) =>
           CustomTabBarIcon(route, focused, color, size),
         tabBarActiveTintColor: '#FED36A',
         tabBarInactiveTintColor: '#617D8A',

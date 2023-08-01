@@ -1,46 +1,79 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
+
+//service
+import { getAllNotifications } from '../../DataService';
+
+
 
 const Item = ({item, onPress}) => (
   <TouchableOpacity onPress={onPress}>
     <View style={styles.item}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.time}>{item.time}</Text>
+      <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+      <Text style={styles.name}>Tác giả: {item.author}</Text>
+      <Text style={styles.time}>{item.date?item.date:"Chưa xác định"}</Text>
     </View>
   </TouchableOpacity>
 );
 
-const Tuition = () => {
-  const navigation = useNavigation();
+const Tuition = (props) => {
+  const {navigation} = props;
+
+  useEffect(() => {
+    getData();
+  }, []); //get data when first render
+
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const getData = async () => {
+    const response = await getAllNotifications();
+    // console.log('response:', response);
+    if (response?.status === 200) {
+      filterData(response?.data);
+      setLoading(false);
+    }
+  };
+
+  //lọc dữ liệu
+  const filterData = (data) => {
+    const newData = data.filter((item) => {
+      return item.type === 3;
+    });
+    setData(newData);
+  };
+
+  
   const renderItem = ({item}) => (
     <Item item={item} onPress={() => handleItemPress(item)} />
   );
 
   const handleItemPress = item => {
-    // Xử lý hành động khi một mục được bấm vào
-    console.log('Pressed item:', item.name);
-    navigation.navigate('TuitionStack');
+    // console.log('Pressed item:', item.name);
+    navigation.navigate('Detail', {data:item});
   };
 
   return (
     <View style={styles.container}>
       <FlatList
+        onRefresh={getData}
+        refreshing={loading}
         data={data}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
       />
     </View>
   );
 };
 
+export default Tuition;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#212832',
-    paddingTop: 16,
+    paddingTop: 12,
     width: '100%',
     height: '100%',
   },
@@ -54,71 +87,22 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#ffffff',
   },
   name: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#B8B8B8',
     marginTop: 6,
   },
   time: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#B8B8B8',
     marginTop: 10,
   },
 });
 
-export default Tuition;
 
-const data = [
-  {
-    id: '1',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: lientt',
-    time: 'Thời gian: 20/10/2021 10:00',
-  },
-  {
-    id: '2',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: nhuntq20',
-    time: 'Thời gian: 20/10/2021 10:00',
-  },
-  {
-    id: '3',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: nhuntq20',
-    time: 'Thời gian: 20/10/2021 10:00',
-  },
-  {
-    id: '4',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: nhuntq20',
-    time: 'Thời gian: 20/10/2021 10:00',
-  },
-  {
-    id: '5',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: nhuntq20',
-    time: 'Thời gian: 20/10/2021 10:00',
-  },
-  {
-    id: '6',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: nhuntq20',
-    time: ' 20/10/2021 10:00',
-  },
-  {
-    id: '7',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: nhuntq20',
-    time: 'Thời gian: 20/10/2021 10:00',
-  },
-  {
-    id: '8',
-    title: 'THÔNG BÁO PHÁT SÁCH GIÁO TRÌNH HỌC KỲ SUMMER 2023',
-    name: 'Người đăng: nhuntq20',
-    time: 'Thời gian: 20/10/2021 10:00',
-  },
-];
+
+

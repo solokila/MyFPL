@@ -21,7 +21,6 @@ function App(): JSX.Element {
       <UserProvider>
         <AppNavigation />
       </UserProvider>
-      {/* <UserNavigation /> */}
     </SafeAreaView>
   );
 }
