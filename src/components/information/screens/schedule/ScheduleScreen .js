@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
 import MonthMenu from './MonthMenu';
 // Import your API function to fetch schedule data from the database
 // import { fetchScheduleData } from './api';
+// sevice
+import { getScheduleById } from '../../DataService';
+import { UserContext } from '../../../users/UserContext';
 
 // Fake data for testing
 const FAKE_DATA = [
@@ -58,24 +61,72 @@ const FAKE_DATA = [
 ];
 
 const ScheduleScreen = () => {
-  const [selectedMonth, setSelectedMonth] = useState('January');
+  const [selectedMonth, setSelectedMonth] = useState("tháng 1");
   const [selectedDay, setSelectedDay] = useState(1);
   const [scheduleData, setScheduleData] = useState(FAKE_DATA);
   const [showModal, setShowModal] = useState(false);
   const [selectedScheduleItem, setSelectedScheduleItem] = useState(null);
 
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useContext(UserContext);
+
+  // lữu giữ ngày tháng được chọn
+  const [dateChosen, setDateChosen] = useState('');
+
+
+
+  const getData = async () => {
+    const response = await getScheduleById(user._id);
+    // console.log('response:', response);
+    if (response?.status === 200) {
+      setData(response?.data);
+      setLoading(false);
+    }
+  };
+
+  // get data when first render
+  useEffect(() => {
+    getData();
+  }, []);
+
+
+  // get data by month and day
+  const fetchScheduleData = async (month, day) => {
+    // console.log('data:', data);
+    const monthNumber = month.split(' ')[1]; // Get the month number from the month name
+    setDateChosen(`${day}/${monthNumber}/2023`);
+    // console.log('dateChosen:', dateChosen);
+    // console.log('month:', monthNumber);
+    // console.log('day:', day);
+    try {
+      const newData = data.filter((item) => {
+        return item.date.some((date) => {
+          const dateObject = new Date(date);
+          // console.log('dateObject:', dateObject);
+          return dateObject.getMonth() + 1 === monthNumber * 1 && dateObject.getDate() === day * 1;
+        });
+      });
+      return newData;
+    } catch (error) {
+      console.log('error:', error);
+    }
+  };
+
+
+
+
   // Fetch schedule data for the selected day whenever the month or day changes
   useEffect(() => {
-    // Replace this with your API call to fetch data from the database
-    // fetchScheduleData(selectedMonth, selectedDay)
-    //   .then((data) => {
-    //     setScheduleData(data);
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error fetching schedule data:', error);
-    //     setScheduleData([]); // Set empty array in case of an error
-    //   });
-    // For testing, we are using the fake data defined above
+    fetchScheduleData(selectedMonth, selectedDay)
+      .then((data) => {
+        setScheduleData(data);
+        // console.log('data:', data);
+      })
+      .catch((error) => {
+        console.error('Error fetching schedule data:', error);
+        setScheduleData([]); // Set empty array in case of an error
+      });
   }, [selectedMonth, selectedDay]);
 
   // Generate data for the days in the selected month (e.g., 1 to 31)
@@ -97,18 +148,27 @@ const ScheduleScreen = () => {
     setShowModal(true);
   };
 
+  // chuyển đổi giờ học từ ca học
+  const convertShiftToTime = (shift) => {
+    if (shift === 1) return '7:30 - 9:30';
+    if (shift === 2) return '9:45 - 11:45';
+    if (shift === 3) return '13:00 - 15:00';
+    if (shift === 4) return '15:15 - 17:15';
+    if (shift === 5) return '17:30 - 19:30';
+    if (shift === 6) return '19:30 - 21:30';
+  };
   // Render schedule details when a schedule item is clicked
   const renderScheduleDetails = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => handleScheduleItemClick(item)}>
         <View style={styles.scheduleItemContainer}>
           <View style={styles.leftInfo}>
-            <Text style={styles.roomNumberText}>{item.roomNumber}</Text>
-            <Text style={styles.dateText}>{item.date}</Text>
+            <Text style={styles.roomNumberText}>Phòng: {item.room}</Text>
+            <Text style={styles.dateText}>Ca: {item.shift}</Text>
           </View>
           <View style={styles.rightInfo}>
             <Text style={styles.scheduleDescription}>{item.description}</Text>
-            <Text style={styles.additionalInfo}>Giáo viên: {item.teacher}</Text>
+            <Text style={styles.additionalInfo}>Giảng viên: {item.teacher}</Text>
             <Text style={styles.additionalInfo}>Lớp: {item.class}</Text>
           </View>
         </View>
@@ -127,18 +187,24 @@ const ScheduleScreen = () => {
           <Text style={styles.popupTitle}>Chi Tiết Môn Học</Text>
           <View style={styles.popupItem}>
             <Text style={styles.popupLabel}>Số phòng:</Text>
-            <Text style={styles.popupValue}>{selectedScheduleItem.roomNumber}</Text>
+            <Text style={styles.popupValue}>{selectedScheduleItem.room}</Text>
+          </View>
+          <View style={styles.popupItem}>
+            <Text style={styles.popupLabel}>Ca:</Text>
+            <Text style={styles.popupValue}>
+              {selectedScheduleItem.shift + " ("+ convertShiftToTime(selectedScheduleItem.shift)+ ")"}
+            </Text>
           </View>
           <View style={styles.popupItem}>
             <Text style={styles.popupLabel}>Ngày:</Text>
-            <Text style={styles.popupValue}>{selectedScheduleItem.date}</Text>
+            <Text style={styles.popupValue}>{dateChosen}</Text>
           </View>
           <View style={styles.popupItem}>
             <Text style={styles.popupLabel}>Mô tả:</Text>
             <Text style={styles.popupValue}>{selectedScheduleItem.description}</Text>
           </View>
           <View style={styles.popupItem}>
-            <Text style={styles.popupLabel}>Giáo viên:</Text>
+            <Text style={styles.popupLabel}>Giảng viên:</Text>
             <Text style={styles.popupValue}>{selectedScheduleItem.teacher}</Text>
           </View>
           <View style={styles.popupItem}>
@@ -180,7 +246,7 @@ const ScheduleScreen = () => {
       <FlatList
         data={scheduleData}
         renderItem={renderScheduleDetails}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item._id}
         contentContainerStyle={styles.scheduleListContainer}
       />
 
@@ -193,7 +259,8 @@ const ScheduleScreen = () => {
 };
 
 const menuOptions = [
-  'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12',
+  'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+  'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12',
 ];
 
 
@@ -233,7 +300,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
- 
+
   scheduleListContainer: {
     flexGrow: 1, // Make the FlatList take the available space to align it closely with the days view
   },
@@ -249,6 +316,8 @@ const styles = StyleSheet.create({
   },
   leftInfo: {
     alignItems: 'flex-start', // Align items to the left side
+    //chieu ngang
+    width: '45%',
   },
   roomNumberText: {
     fontSize: 18,
@@ -261,7 +330,7 @@ const styles = StyleSheet.create({
   },
   rightInfo: {
     flex: 1, // To allow description to take the remaining space on the right side
-    paddingLeft: 20,
+    paddingLeft: 20
   },
   scheduleDescription: {
     fontSize: 16,

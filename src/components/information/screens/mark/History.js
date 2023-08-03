@@ -4,7 +4,6 @@ import Collapsible from 'react-native-collapsible';
 
 //service
 import { getAllTranscripts, getAllSubjects } from '../../DataService';
-import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
 
 
 
@@ -59,37 +58,36 @@ function History() {
   const [expandedItem, setExpandedItem] = useState(null);
 
 
-  
+
   const renderItem = ({ item }) => {
     const isExpanded = expandedItem === item._id;
     return (
       <TouchableOpacity onPress={() => handleItemPress(item._id)}>
-      <View style={[styles.item, {}]}>
-        <View style={[, { flexDirection: 'row', justifyContent: 'space-between', textAlign: 'center' }]}>
-           <Text style={styles.title}>{item.term}</Text>
-           <Text style={styles.title}>{findSubject(item.subject_id).idSubject}</Text>
-           <Text style={styles.title}>{item.status}</Text>
-         </View>
+        <View style={[styles.item, {}]}>
+          <View style={[, { flexDirection: 'row', justifyContent: 'space-between', textAlign: 'center' }]}>
+            <Text style={styles.title}>{item.term}</Text>
+            <Text style={styles.title}>{findSubject(item.subject_id)?.idSubject}</Text>
+            <Text style={styles.title}>{item.mark>5?"passed":"fail"}</Text>
+          </View>
 
-        <Collapsible collapsed={!isExpanded}>
-          <View style={[{ width: '100%', height: '1', backgroundColor: 'white' }]}></View>
-          <View style={[{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }]}>
-            <View style={[{}]}>
-               <Text style={{ 
-                color: '#FFFFFF', 
-                fontSize: 16 , 
-                //giới hạn độ dài của text
-                width: 100,
-                }}>Môn: {findSubject(item.subject_id).name}</Text>
-               <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Điểm: {item.mark}</Text>
-             </View>
-             <View>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Tín chỉ: {findSubject(item.subject_id).credit}</Text>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Số buổi: 17</Text>
+          <Collapsible collapsed={!isExpanded}>
+            <View style={[{ width: '100%', height: '1', backgroundColor: 'white' }]}></View>
+            <View style={[{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }]}>
+              <View>
+                <Text style={{
+                  color: '#FFFFFF',
+                  fontSize: 16,
+                  width: 200
+                }}>Môn: {findSubject(item.subject_id)?.name}</Text>
+                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Điểm: {item.mark}</Text>
+              </View>
+              <View>
+                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Tín chỉ: {findSubject(item.subject_id)?.credit}</Text>
+                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Số buổi: 17</Text>
+              </View>
             </View>
-           </View>
-         </Collapsible>
-      </View>
+          </Collapsible>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -106,7 +104,7 @@ function History() {
     <View style={styles.container}>
 
       <View style={styles.containerTop}>
-        <Text style={styles.titleTopText}>Học kỳ</Text>
+        <Text style={styles.titleTopText}>Học kỳ               </Text>
         <Text style={styles.titleTopText}>Mã Môn</Text>
         <Text style={styles.titleTopText}>Trạng thái</Text>
       </View>

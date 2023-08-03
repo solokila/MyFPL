@@ -18,4 +18,10 @@ export const getAllSubjects = async() =>{
     return response;
 }
 
+// get schedule by id of student
+export const getScheduleById = async(id) =>{
+    const response = await AxiosInstance().get(`/schedule/id?id=${id}`);
+    return response;
+}
+
 

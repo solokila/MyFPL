@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   FlatList,
@@ -15,152 +15,102 @@ import {
 } from 'react-native';
 import Collapsible from 'react-native-collapsible';
 
+//service
+import { getAllTranscripts, getAllSubjects } from '../../DataService';
+
 
 function MarkPage() {
 
-  const [data, setData] = useState([
-    {
-      id: '1',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '9',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-    {
-      id: '2',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '8',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-    {
-      id: '3',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '9',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-    {
-      id: '4',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '9',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-    {
-      id: '5',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '9',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-    {
-      id: '6',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '9',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-    {
-      id: '7',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '9',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-    {
-      id: '8',
-      term: 'Học kì: ' + 4,
-      credit: 'số tín chỉ: ' + 3,
-      idSubject: 'Mã môn: MOB401',
-      semester: 'Spring 2023',
-      subject: 'Xay dung trang web',
-      mark: '9',
-      status: 'Trạng thái: đang học',
-      isCollapse: true,
-    },
-  ]);
+  //lấy danh sách môn học
+  const [subjects, setSubjects] = useState([]);
+  const getSubjects = async () => {
+    const response = await getAllSubjects();
+    if (response?.status === 200) {
+      setSubjects(response?.data);
+    }
+  };
 
-  const Item = ({ item, onPress }) => (
+  // tìm tên môn học theo id
+  const findSubject = (id) => {
+    const subject = subjects.find((item) => {
+      return item._id === id;
+    });
+    // console.log('subject:', subject);
+    return subject;
+  };
 
-    <TouchableOpacity onPress={onPress}>
-      <View style={[styles.item, {}]}>
-        <View style={[, {flexDirection: 'row', justifyContent: 'space-between', textAlign: 'center'}]}>
-          <Text style={styles.title}>{item.semester}</Text>
-          <Text style={styles.title}>{item.subject}</Text>
-          <Text style={styles.title}>{item.mark}</Text>
-        </View>
-        
+  useEffect(() => {
+    getData();
+    getSubjects();
+  }, []); //get data when first render
 
-        <Collapsible collapsed={item.isCollapse}>
-          <View style={[{width: '100%', height:'1', backgroundColor: 'white'}]}></View>
-          <View style={[{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10}]}>
-          <View style={[{}]}>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.term}</Text>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.idSubject}</Text>
-            </View>
-            <View>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.credit}</Text>
-              <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.status}</Text>
-            </View>
+  //data
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  //filter data
+  const filterData = (data) => {
+    const newData = data.filter((item) => {
+      return item.status === 1 || item.status === 2 || item.status === 3;
+    });
+    setData(newData);
+  };
+
+  //get data
+  const getData = async () => {
+    const response = await getAllTranscripts();
+    // console.log('response:', response);
+    if (response?.status === 200) {
+      filterData(response?.data);
+      setLoading(false);
+    }
+  };
+
+  // State để theo dõi mục đang được mở rộng
+  const [expandedItem, setExpandedItem] = useState(null);
+
+  
+
+  const renderItem = ({ item }) => {
+    const isExpanded = expandedItem === item._id;
+    return (
+      <TouchableOpacity onPress={()=>handleItemPress(item._id)}>
+        <View style={styles.item}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', textAlign: 'center' }}>
+            <Text style={styles.title}>{item.term}</Text>
+            <Text style={styles.title}>{findSubject(item.subject_id)?.idSubject}</Text>
+            <Text style={styles.title}>{item.mark}</Text>
           </View>
 
 
-        </Collapsible>
-      </View>
+          <Collapsible collapsed={!isExpanded}>
+            <View style={[{ width: '100%', height: '1', backgroundColor: 'white' }]}></View>
+            <View style={[{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }]}>
+              <View style={[{}]}>
+                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Kỳ: {item.term}</Text>
+                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Môn: {findSubject(item.subject_id)?.name}</Text>
+              </View>
+              <View>
+                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Tín chỉ: {findSubject(item.subject_id)?.credit}</Text>
+                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>{item.mark>5?"passed":"fail"}</Text>
+              </View>
+            </View>
 
-    </TouchableOpacity>
-  );
 
-  const renderItem = ({ item }) => (
-    <Item item={item} onPress={() => toggleCollapse(item.id)} />
-  );
-  const handleItemPress = item => {
+          </Collapsible>
+        </View>
+
+      </TouchableOpacity>
+    );
+  };
+
+  const handleItemPress = (itemID) => {
     // Xử lý hành động khi một mục được bấm vào
-    // console.log('Pressed item:', item.semester);
-    item.isCollapse = !item.isCollapse;
+    // console.log('Pressed item:', itemID);
+    setExpandedItem((prevExpandedItem) => (prevExpandedItem === itemID ? null : itemID))
   };
 
-  const toggleCollapse = (itemId) => {
-    setData((prevData) => {
-      return prevData.map((item) => {
-        if (item.id === itemId) {
-          return { ...item, isCollapse: !item.isCollapse };
-        }
-        return item;
-      });
-    });
-  };
-
-  // info
+  
   return (
     <View style={styles.container} >
       <View style={{}}>
@@ -203,9 +153,9 @@ function MarkPage() {
           </View>
         </View>
 
-        <View style={[styles.item, {flexDirection: 'row', justifyContent:'space-between'}]}>
-          <Text style={[styles.title, { fontWeight: 'bold' }]}>Học kỳ</Text>
-          <Text style={[styles.title, { fontWeight: 'bold' }]}>Môn</Text>
+        <View style={[styles.item, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+          <Text style={[styles.title, { fontWeight: 'bold' }]}>Học kỳ             </Text>
+          <Text style={[styles.title, { fontWeight: 'bold' }]}>Mã Môn</Text>
           <Text style={[styles.title, { fontWeight: 'bold' }]}>Điểm</Text>
         </View>
 
@@ -216,7 +166,7 @@ function MarkPage() {
           scrollEnabled={true}
           data={data}
           renderItem={renderItem}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item._id}
         />
       </View>
     </View>
