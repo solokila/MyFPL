@@ -1,32 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Modal, TouchableWithoutFeedback } from 'react-native';
+
+//service
+import { getAttendanceById, getAllSubjects } from '../../DataService';
+
+//context
+import { UserContext } from '../../../users/UserContext';
+
+
+
 const AttendanceScreen = (props) => {
   const { navigation } = props;
 
   const [showMenu, setShowMenu] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState('20'); // Default selection
-  const [attendanceData, setAttendanceData] = useState([
-    // Replace this with your actual attendance data
-    {
-      id: '1',
-      NameClass: 'Math Class',
-      MissUntilNow: '5',
-      AllCountMiss: '10',
-    },
-    {
-      id: '2',
-      NameClass: 'Math Class',
-      MissUntilNow: '5',
-      AllCountMiss: '10',
-    },
-    {
-      id: '3',
-      NameClass: 'Math Class',
-      MissUntilNow: '5',
-      AllCountMiss: '10',
-    },
-    // More attendance items here
-  ]);
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [subjects, setSubjects] = useState([]);
+
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    getData();
+    getSubjects();
+  }, []); //get data when first render
+
+  const getData = async () => {
+    const response = await getAttendanceById(user._id);
+    // console.log('response:', response);
+    if (response?.status === 200) {
+      setData(response?.data);
+      setLoading(false);
+    }
+  };
+
+  const getSubjects = async () => {
+    const response = await getAllSubjects();
+    // console.log('response:', response);
+    if (response?.status === 200) {
+      setSubjects(response?.data);
+    }
+  };
+
+  //find subject by id
+  const findSubject = (id) => {
+    const subject = subjects.find((item) => {
+      return item._id === id;
+    });
+    return subject;
+  };
+
+
+
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
@@ -34,7 +60,7 @@ const AttendanceScreen = (props) => {
 
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const menuOptions = ['2020', '2021', '2022', '2023'];
+  const menuOptions = ['2022', '2023'];
 
   const [text, setText] = useState(menuOptions[menuOptions.length - 1]);
 
@@ -54,23 +80,27 @@ const AttendanceScreen = (props) => {
           () => props.navigation.navigate('AttendanceInfoScreen',
           {
             attendanceData: item,
+            subjectName: findSubject(item.subject_id)?.name,
           })
         }
       >
       <View style={styles.itemRow}>
-          <View style={styles.itemColumn}>
-            <Text style={styles.classNameText}>{item.NameClass}</Text>
+          <View style={styles.itemColumnleft}>
+            <Text
+             style={styles.classNameText}
+             numberOfLines={2}
+             >{findSubject(item.subject_id)?.name}</Text>
             {item.Description ? (
               <Text style={styles.itemDescription}>{item.Description}</Text>
             ) : null}
           </View>
           <View style={styles.itemColumn}>
-            <Text style={styles.missCount}>{item.MissUntilNow}</Text>
-            <Text style={styles.itemSmallText}>Missed</Text>
+            <Text style={styles.missCount}>{item.dateAbsent.length}</Text>
+            <Text style={styles.itemSmallText}>Vắng mặt</Text>
           </View>
           <View style={styles.itemColumn}>
-            <Text style={styles.allCount}>{item.AllCountMiss}</Text>
-            <Text style={styles.itemSmallText}>Total</Text>
+            <Text style={styles.allCount}>{item.dateAbsent.length+item.datePresent.length}</Text>
+            <Text style={styles.itemSmallText}>Tổng số buổi</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -108,9 +138,11 @@ const AttendanceScreen = (props) => {
       {renderMenu()}
 
       <FlatList
-        data={attendanceData}
+        data={data}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        refreshing={loading}
+        onRefresh={getData}
+        keyExtractor={(item) => item._id}
         contentContainerStyle={styles.flatListContainer}
       />
     </View>
@@ -148,6 +180,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1, // Each itemColumn takes equal space
   },
+  itemColumnleft: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    flex: 2, // Each itemColumn takes equal space
+  },
   itemDescription: {
     color: '#B0B0B0',
     fontSize: 14,
@@ -158,7 +195,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   allCount: {
-    color: '#000000', // Black color for AllCountMiss count
+    color: '#00FF66',
     fontSize: 18,
     fontWeight: 'bold',
   },

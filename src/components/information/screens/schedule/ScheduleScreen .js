@@ -61,8 +61,8 @@ const FAKE_DATA = [
 ];
 
 const ScheduleScreen = () => {
-  const [selectedMonth, setSelectedMonth] = useState("tháng 1");
-  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedMonth, setSelectedMonth] = useState("tháng 7");
+  const [selectedDay, setSelectedDay] = useState(3);
   const [scheduleData, setScheduleData] = useState(FAKE_DATA);
   const [showModal, setShowModal] = useState(false);
   const [selectedScheduleItem, setSelectedScheduleItem] = useState(null);
@@ -127,7 +127,7 @@ const ScheduleScreen = () => {
         console.error('Error fetching schedule data:', error);
         setScheduleData([]); // Set empty array in case of an error
       });
-  }, [selectedMonth, selectedDay]);
+  }, [selectedMonth, selectedDay, loading]);
 
   // Generate data for the days in the selected month (e.g., 1 to 31)
   const daysInSelectedMonth = Array.from({ length: 31 }, (_, index) => index + 1);
@@ -228,7 +228,10 @@ const ScheduleScreen = () => {
       <FlatList
         data={daysInSelectedMonth}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleDayPress(item)}>
+          <TouchableOpacity 
+          style={styles.dayItemContainer}
+          key={item.toString()} 
+          onPress={() => handleDayPress(item)}>
             <View style={[styles.dayItem, item === selectedDay && styles.selectedDayItem]}>
               <Text style={[styles.dayText, item === selectedDay && styles.selectedDayText]}>
                 {item}
@@ -246,6 +249,8 @@ const ScheduleScreen = () => {
       <FlatList
         data={scheduleData}
         renderItem={renderScheduleDetails}
+        onRefresh={getData}
+        refreshing={loading}
         keyExtractor={item => item._id}
         contentContainerStyle={styles.scheduleListContainer}
       />
@@ -270,6 +275,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#212832',
+  },
+  dayItemContainer: {
+    width: 70,
+    height: 80,
+    marginVertical: 10,
   },
   dayItem: {
     width: 60,

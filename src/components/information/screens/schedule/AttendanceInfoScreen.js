@@ -4,35 +4,77 @@ import { Calendar } from 'react-native-calendars';
 
 const AttendanceInfoScreen = (props) => {
   const { route, navigation } = props;
-  const { attendanceData } = route.params;
+  const { attendanceData, subjectName } = route.params;
+
 
   const goBack = () => {
     navigation.goBack();
   };
   const customTheme = {
     // Customize the calendar theme here
-    textDayFontFamily: 'Roboto-Regular',
-    textMonthFontFamily: 'Roboto-Bold',
-    textDayHeaderFontFamily: 'Roboto-Medium',
-    todayTextColor: '#FF5252',
-    arrowColor: '#FED36A',
-    selectedDayBackgroundColor: '#FED36A',
-    selectedDayTextColor: '#FFFFFF',
-    textDisabledColor: '#B0B0B0',
+    todayTextColor: '#800000',
+    calendarBackground: '#FFFFFF', //background color
+
+    monthTextColor: '#FED36A', //month text color
+    textMonthFontWeight: 'bold', //month text font weight
+    textMonthFontSize: 18,
+
+    arrowColor: '#00FF00', //arrow color
+
+    dayTextColor: '#000000', //day text color
+    textDayFontSize: 16, //day text font size
+    textDisabledColor: '#BBBBBB', //disable text color
+    textDayFontWeight: '300',
+
+    textSectionTitleColor: '#FED36A', // title color
+    textDayHeaderFontSize: 16, //week text font size
+
+  
   };
-  const attendanceData1 = [
-    { date: '2023-07-10', status: 'absent' },
-    { date: '2023-07-12', status: 'off' },
-    { date: '2023-07-15', status: 'off' },
-    { date: '2023-07-18', status: 'absent' },
-    // Add more attendance data with 'date' and 'status' properties
-  ];
+
+  // format date to yyyy-mm-dd
+  const dateAbsent = attendanceData.dateAbsent.map((date) => {
+    return date.substring(0, 10);
+  });
+
+  const datePresent = attendanceData.datePresent.map((date) => {
+    return date.substring(0, 10);
+  });
 
   const markedDatesData = {};
-  attendanceData1.forEach((attendance) => {
-    const { date, status } = attendance;
-    markedDatesData[date] = { marked: true, dotColor: status === 'off' ? '#FF5252' : '#0bd40e' };
+
+  dateAbsent.forEach((date) => {
+    markedDatesData[date] = { 
+      // marked: true, dotColor: '#FF5252',
+      customStyles: {
+        container: {
+          backgroundColor: 'red'
+        },
+        text: {
+          color: 'black',
+          fontWeight: 'bold'
+        }
+      }
+      
+      };
   });
+
+  datePresent.forEach((date) => {
+    markedDatesData[date] = { 
+      customStyles: {
+        container: {
+          backgroundColor: '#00FF00'
+        },
+        text: {
+          color: 'black',
+          fontWeight: 'bold'
+        }
+      } 
+    };
+  });
+
+  // console.log(markedDatesData);
+
 
 
   return (
@@ -44,33 +86,26 @@ const AttendanceInfoScreen = (props) => {
 
       <View style={styles.itemContainer}>
         <View style={styles.itemRow}>
-          <View style={styles.itemColumn}>
-            <Text style={styles.classNameText}>{attendanceData.NameClass}</Text>
-            {attendanceData.Description ? (
-              <Text style={styles.itemDescription}>{attendanceData.Description}</Text>
-            ) : null}
+          <View style={styles.itemColumnleft}>
+            <Text
+              numberOfLines={2}
+              style={styles.classNameText}
+            >{subjectName}</Text>
           </View>
           <View style={styles.itemColumn}>
-            <Text style={styles.missCount}>{attendanceData.MissUntilNow}</Text>
-            <Text style={styles.itemSmallText}>Missed</Text>
+            <Text style={styles.missCount}>{attendanceData.dateAbsent.length}</Text>
+            <Text style={styles.itemSmallText}>Vắng mặt</Text>
           </View>
           <View style={styles.itemColumn}>
-            <Text style={styles.allCount}>{attendanceData.AllCountMiss}</Text>
-            <Text style={styles.itemSmallText}>Total</Text>
+            <Text style={styles.allCount}>{attendanceData.dateAbsent.length + attendanceData.datePresent.length}</Text>
+            <Text style={styles.itemSmallText}>Tổng số buổi</Text>
           </View>
         </View>
       </View>
 
       {/* Add the calendar */}
       <Calendar
-        // onDayPress={(day) => {
-        //   console.log('Selected day:', day);
-        //   // You can handle the selected day here as needed
-        // }}
-       
-      
-        // Add other props here for further customization
-        // For example, minDate, maxDate, markingType, etc.
+        markingType={'custom'}
         markedDates={markedDatesData}
         theme={customTheme}
         style={styles.calendarContainer}
@@ -83,8 +118,10 @@ const styles = StyleSheet.create({
   // ... (previous styles remain the same) ...
   calendarContainer: {
     marginTop: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#455A64',
     borderRadius: 10,
+    borderColor: '#FED36A',
+    borderWidth: 1,
     padding: 10,
   },
   container: {
@@ -130,6 +167,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+  itemColumnleft: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    flex: 2, // Each itemColumn takes equal space
+  },
   classNameText: {
     color: '#FFFFFF',
     fontSize: 16,
@@ -150,7 +192,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   allCount: {
-    color: '#000000',
+    color: '#00FF66',
     fontSize: 18,
     fontWeight: 'bold',
   },

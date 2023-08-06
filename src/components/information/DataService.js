@@ -24,4 +24,16 @@ export const getScheduleById = async(id) =>{
     return response;
 }
 
+// get exam schedule by id of student
+export const getExamScheduleById = async(id) =>{
+    const response = await AxiosInstance().get(`/exam/id?id=${id}`);
+    return response;
+}
+
+// get attendance by id of student
+export const getAttendanceById = async(id) =>{
+    const response = await AxiosInstance().get(`/attendance/id?id=${id}`);
+    return response;
+}
+
 

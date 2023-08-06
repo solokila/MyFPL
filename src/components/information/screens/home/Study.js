@@ -6,15 +6,7 @@ import { getAllNotifications } from '../../DataService';
 
 
 
-const Item = ({item, onPress}) => (
-  <TouchableOpacity onPress={onPress}>
-    <View style={styles.item}>
-      <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
-      <Text style={styles.name}>Tác giả: {item.author}</Text>
-      <Text style={styles.time}>{item.date?item.date:"Chưa xác định"}</Text>
-    </View>
-  </TouchableOpacity>
-);
+
 
 const Study = (props) => {
   const {navigation} = props;
@@ -23,6 +15,13 @@ const Study = (props) => {
   useEffect(() => {
     getData();
   }, []); //get data when first render
+
+  //format date to dd/mm/yyyy
+  const formatDate = (date) => {
+    const dateArr = date.split('-');
+    const dateArr2 = dateArr[2].split('T');
+    return `${dateArr2[0]}/${dateArr[1]}/${dateArr[0]}`;
+  };
 
 
   const [data, setData] = useState([]);
@@ -44,6 +43,16 @@ const Study = (props) => {
     });
     setData(newData);
   };
+
+  const Item = ({item, onPress}) => (
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.item}>
+        <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+        <Text style={styles.name}>Tác giả: {item.author}</Text>
+        <Text style={styles.time}>{item.date?formatDate(item.date):"Chưa xác định"}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   
   const renderItem = ({item}) => (
@@ -99,6 +108,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#B8B8B8',
     marginTop: 10,
+    //đẩy về phía bên phải
+    textAlign: 'right',
   },
 });
 

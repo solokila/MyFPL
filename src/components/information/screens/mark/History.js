@@ -65,25 +65,47 @@ function History() {
       <TouchableOpacity onPress={() => handleItemPress(item._id)}>
         <View style={[styles.item, {}]}>
           <View style={[, { flexDirection: 'row', justifyContent: 'space-between', textAlign: 'center' }]}>
-            <Text style={styles.title}>{item.term}</Text>
-            <Text style={styles.title}>{findSubject(item.subject_id)?.idSubject}</Text>
-            <Text style={styles.title}>{item.mark>5?"passed":"fail"}</Text>
+            <View style={styles.leftColumn}>
+              <Text style={styles.title}>{item.term}</Text>
+            </View>
+            <View style={styles.middleColumn}>
+              <Text style={styles.title}>{findSubject(item.subject_id)?.idSubject}</Text>
+            </View>
+            <View style={styles.rightColumn}>
+              <Text style={styles.title}>{item.mark > 5 ? "passed" : "fail"}</Text>
+            </View>
           </View>
 
           <Collapsible collapsed={!isExpanded}>
             <View style={[{ width: '100%', height: '1', backgroundColor: 'white' }]}></View>
-            <View style={[{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }]}>
+            <View style={[{ flexDirection: 'column', justifyContent: 'space-between', paddingTop: 10 }]}>
               <View>
                 <Text style={{
                   color: '#FFFFFF',
                   fontSize: 16,
-                  width: 200
+                  width: '100%',
+                  marginBottom: 10,
                 }}>Môn: {findSubject(item.subject_id)?.name}</Text>
-                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Điểm: {item.mark}</Text>
               </View>
-              <View>
-                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Tín chỉ: {findSubject(item.subject_id)?.credit}</Text>
-                <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Số buổi: 17</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <View style={{ width: "40%", alignItems: 'left', }}>
+                  <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Điểm: {item.mark}</Text>
+
+                </View>
+                <View style={{ width: "30%", alignItems: 'center', }}>
+                  <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Tín chỉ: {findSubject(item.subject_id)?.credit}</Text>
+
+                </View>
+                <View style={{ width: "30%", alignItems: 'center', }}>
+                  <Text style={[{ color: '#FFFFFF', fontSize: 16 }]}>Số buổi: 17</Text>
+
+                </View>
               </View>
             </View>
           </Collapsible>
@@ -104,9 +126,15 @@ function History() {
     <View style={styles.container}>
 
       <View style={styles.containerTop}>
-        <Text style={styles.titleTopText}>Học kỳ               </Text>
-        <Text style={styles.titleTopText}>Mã Môn</Text>
-        <Text style={styles.titleTopText}>Trạng thái</Text>
+        <View style={styles.leftColumn}>
+          <Text style={styles.titleTopText}>Học kỳ</Text>
+        </View>
+        <View style={styles.middleColumn}>
+          <Text style={styles.titleTopText}>Mã Môn</Text>
+        </View>
+        <View style={styles.rightColumn}>
+          <Text style={styles.titleTopText}>Trạng thái</Text>
+        </View>
       </View>
 
       <FlatList
@@ -135,6 +163,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     // borderRadius: 10,
     elevation: 5,
+  },
+
+  leftColumn: {
+    width: "40%",
+    // backgroundColor: 'red',
+    alignItems: 'left',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  middleColumn: {
+    width: "30%",
+    // backgroundColor: 'blue',
+    alignItems: 'right',
+    justifyContent: 'center',
+  },
+  rightColumn: {
+    width: "30%",
+    // backgroundColor: 'green',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   titleTopText: {

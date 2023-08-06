@@ -1,36 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
 
-import Collapsible from 'react-native-collapsible';
 
-const Item = ({item, onPress}) => (
-  <TouchableOpacity onPress={onPress}>
-    <View style={styles.item}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.title}>{item.name}</Text>
-      <Text style={styles.title}>{item.time}</Text>
-    </View>
-  </TouchableOpacity>
-);
+//service
+import { getAllTranscripts, getAllSubjects } from '../../DataService';
 
-const Semester = ({ title, description }) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  
-    const toggleCollapse = () => {
-      setIsCollapsed(!isCollapsed);
+const Semester = () => {
+
+  const [isExpanded, setIsExpanded] = useState(false);
+  //data
+  const [data, setData] = useState([]);
+  //lấy danh sách học kỳ
+  const [semester, setSemester] = useState([]);
+  //selectedText semester
+  const [selectedText, setSelectedText] = useState('Summer 2023');
+
+
+
+  useEffect(() => {
+    getData();
+  }, []); //get data when first render
+
+  //get data
+  const getData = async () => {
+    const response = await getAllTranscripts();
+    // console.log('response:', response);
+    if (response?.status === 200) {
+      setData(response?.data);
+      filterSemester(response?.data);
     }
+  };
 
+  //lọc dữ liệu danh sách học kỳ từ data không trùng nhau
+  const filterSemester = (data) => {
+    const uniqueSemesters = [...new Set(data.map(item => item.term))];
+    setSemester(uniqueSemesters);
+  };
+
+      
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
   return (
     
     <View style={styles.container}>
-      <TouchableOpacity onPress={toggleCollapse}>
+      <TouchableOpacity  onPress={toggleExpanded}>
       <View style={[styles.item]}>
-        <Text style={{color: '#FFFFFF', textAlign: 'center', fontSize: 24, fontWeight: 'bold'}}>Summer 2023</Text>
+        <Text 
+        style={{
+          color: '#FED36A',
+           textAlign: 'center', 
+           fontSize: 24, 
+           fontWeight: 'bold'
+           }}>
+          {selectedText}
+            </Text>
       </View>
-      <Collapsible collapsed={isCollapsed}>
-            <Text>{description}</Text>
-          </Collapsible>
       </TouchableOpacity>
+      {isExpanded && (
+        <View style={styles.dropdown}>
+          {/* Sử dụng map để tạo danh sách lựa chọn */}
+          {semester.map((item, index) => {
+            return (
+              <TouchableOpacity key={index} onPress={
+                () => {
+                  setSelectedText(item);
+                  toggleExpanded();
+                }
+              }>
+                <Text style={styles.option}>{item}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
     </View>
   );
 };
@@ -55,58 +99,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ffffff',
   },
+  dropdown: {
+    backgroundColor: '#455A64',
+    marginHorizontal: 16,
+    borderRadius: 10,
+    elevation: 5,
+    marginTop: 12,
+    padding: 10,
+  },
+  option: {
+    color: '#FED36A',
+    fontSize: 18,
+    padding: 8,
+    textAlign: 'center',
+  },
   
 });
 
 export default Semester;
 
-// const data = [
-//   {
-//     id: '1',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-//   {
-//     id: '2',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-//   {
-//     id: '3',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-//   {
-//     id: '4',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-//   {
-//     id: '5',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-//   {
-//     id: '6',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-//   {
-//     id: '7',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-//   {
-//     id: '8',
-//     title: 'Lập trình game',
-//     name: 'Điểm trung bình: 9',
-//     time: 'Trạng thái: Passed',
-//   },
-// ];

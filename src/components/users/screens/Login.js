@@ -19,6 +19,8 @@ const Register = (props) => {
   const [selectedButtonText, setSelectedButtonText] = useState('Chọn cơ sở đào tạo');
 
   const [branch, setBranch] = useState([])
+  const [imgUrl, setImgUrl] = useState('https://i.imgur.com/AlRVVtg.png')
+
   const [username, setUsername] = useState('admin123');
   const [password, setPassword] = useState('admin123');
   const { onLogin } = useContext(UserContext);
@@ -54,6 +56,7 @@ const Register = (props) => {
   const handleItemPress = (item) => {
     setSelectedItem(item);
     setSelectedButtonText(item.name);
+    setImgUrl(item.backGround);
   };
 
   return (
@@ -78,7 +81,7 @@ const Register = (props) => {
                 style={loginstyles.background_image}
                 //resizeMode='contain' de hinh anh khong bi cat
                 resizeMode='contain'
-                source={require('../../../media/img/pana.png')}
+                source={{uri: imgUrl? imgUrl: 'https://i.imgur.com/AlRVVtg.png'}}
               />
             </View>
 
@@ -123,12 +126,12 @@ const Register = (props) => {
             </TouchableOpacity>
 
             {/* Dòng "Don’t have an account? Sign Up" */}
-            <View style={loginstyles.signUpContainer}>
+            {/* <View style={loginstyles.signUpContainer}>
               <Text style={loginstyles.accountText}>Don’t have an account?</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={loginstyles.signUpText}>Sign Up</Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
 
             {/*phan modal*/}
             <Modal visible={isModalVisible}
