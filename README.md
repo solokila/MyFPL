@@ -1,3 +1,7 @@
+# App MyFPL
+app này được mô phỏng dựa trên app chính myFPL của trường FPT Polytechnic - app còn đơn giản và chưa hoàn chỉnh.
+
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
